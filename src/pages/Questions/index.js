@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { decode } from 'html-entities';
-import { get } from 'axios';
+// import { get } from 'axios';
 import { useHistory } from 'react-router-dom';
 import { Box } from '@mui/system';
 import {
@@ -16,25 +16,27 @@ import {
 } from '@mui/material';
 import { useData } from '../../contexts/data';
 import { NextButton, LoadingSpinner } from '../../components';
+import { useApi } from '../../hooks/useApi';
+
+const getRandomInt = (max) => {
+  return Math.floor(Math.random() * Math.floor(max));
+};
 
 export default function Questions() {
   const [currentQuestion, setCurrentQuestion] = useState({});
   const [answers, setCurrentAnswers] = useState([]);
   const [helperText, setHelperText] = useState('Choose at least one option.');
-  const [loading, setLoading] = useState(true);
   const [value, setValue] = useState('');
 
   const { amount, counter, setCounter, score, setScore } = useData();
+  const { response, loading } = useApi({ url });
   const history = useHistory();
 
-  const handleRadioChange = (event) => {
-    setValue(event.target.value);
-    setHelperText('');
-  };
+  let url = `/api.php?amount=${amount}`;
 
   function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
+    // setLoading(true);
 
     if (currentQuestion.correct.toString() === value) {
       setScore(score + 1);
@@ -50,8 +52,7 @@ export default function Questions() {
 
   useEffect(() => {
     async function loadQuestions() {
-      const data = await get('https://opentdb.com/api.php?amount=1');
-
+      // const data = await api.get('/api.php?amount=1');
       const question = data.data.results[0].question;
       const correct = data.data.results[0].correct_answer;
       const incorrects = data.data.results[0].incorrect_answers;
@@ -98,7 +99,7 @@ export default function Questions() {
               onChange={handleRadioChange}
             >
               {answers.map((item, index) => (
-                <Box key={index.toString()}>
+                <Box key={item}>
                   <FormControlLabel
                     value={decode(item)}
                     control={<Radio />}
