@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { decode } from 'html-entities';
-import { get } from 'axios';
 import { useHistory } from 'react-router-dom';
 import { Box } from '@mui/system';
 import {
@@ -14,61 +13,54 @@ import {
   Container,
   Typography,
 } from '@mui/material';
+import api from '../../services/api';
 import { useData } from '../../contexts/data';
 import { NextButton, LoadingSpinner } from '../../components';
 
 export default function Questions() {
-  const [currentQuestion, setCurrentQuestion] = useState({});
-  const [answers, setCurrentAnswers] = useState([]);
-  const [helperText, setHelperText] = useState('Choose at least one option.');
+  const [questionsList, setQuestionsList] = useState([]);
+  const [currentOptions, setCurrentOptions] = useState();
+  const [helperText, setHelperText] = useState('Choose one option.');
   const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState('');
+  const [selected, setSelected] = useState('');
 
-  const { amount, counter, setCounter, score, setScore } = useData();
+  const { amount, currentIndex, setCurrentIndex, score, setScore } = useData();
   const history = useHistory();
 
-  const handleRadioChange = (event) => {
-    setValue(event.target.value);
+  const handleRadioChange = (e) => {
+    setSelected(e.target.value);
     setHelperText('');
   };
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
+  function handleNext() {
+    const correctAnswer = questionsList[currentIndex].correct_answer;
 
-    if (currentQuestion.correct.toString() === value) {
+    if (selected === correctAnswer) {
       setScore(score + 1);
-      setValue('');
     }
 
-    if (counter >= amount) {
+    if (currentIndex + 1 === amount) {
       history.push('/result');
     }
 
-    setCounter(counter + 1);
+    setCurrentIndex(currentIndex + 1);
+    setSelected('');
   }
 
   useEffect(() => {
     async function loadQuestions() {
-      const data = await get('https://opentdb.com/api.php?amount=1');
+      const data = await api.get(`/api.php?amount=${amount}`);
+      const correct = data.data.results[currentIndex].correct_answer;
+      const incorrects = data.data.results[currentIndex].incorrect_answers;
 
-      const question = data.data.results[0].question;
-      const correct = data.data.results[0].correct_answer;
-      const incorrects = data.data.results[0].incorrect_answers;
-      const answers = [...incorrects, correct];
+      setQuestionsList(data.data.results);
 
-      setCurrentQuestion({
-        question: question,
-        correct: correct,
-      });
-
-      setCurrentAnswers(answers);
-      setHelperText('Choose at least one option.');
+      setCurrentOptions([...incorrects, correct]);
       setLoading(false);
     }
 
     loadQuestions();
-  }, [counter]);
+  }, []);
 
   return (
     <Container
@@ -80,29 +72,35 @@ export default function Questions() {
         justifyContent: 'center',
       }}
     >
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <p>{`currentIndex: ${currentIndex}`}</p>
+        <p>{`amount: ${amount}`}</p>
+        <p>{`score: ${score}`}</p>
+        <p>{`selected: ${selected}`}</p>
+      </div>
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form>
           <FormControl component="fieldset" variant="standard">
             <FormLabel component="legend" variant="h5">
               <Typography variant="h4">
-                {decode(currentQuestion.question)}
+                {questionsList[currentIndex].question}
               </Typography>
             </FormLabel>
 
             <RadioGroup
               aria-label="quiz"
               name="quiz"
-              value={value}
+              value={selected}
               onChange={handleRadioChange}
             >
-              {answers.map((item, index) => (
-                <Box key={index.toString()}>
+              {currentOptions.map((item) => (
+                <Box key={item}>
                   <FormControlLabel
-                    value={decode(item)}
+                    value={item}
                     control={<Radio />}
-                    label={decode(item)}
+                    label={item}
                   />
 
                   <Divider />
@@ -119,7 +117,8 @@ export default function Questions() {
               }}
             >
               <FormHelperText>{helperText}</FormHelperText>
-              <NextButton disabled={value === ''} />
+
+              <NextButton disabled={selected === ''} onClick={handleNext} />
             </Box>
           </FormControl>
         </form>

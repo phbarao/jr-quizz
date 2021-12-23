@@ -2,11 +2,11 @@ import React from 'react';
 import { Button } from '@mui/material';
 import { useData } from '../../contexts/data';
 
-export default function NextButton({ disabled }) {
-  const { amount, counter } = useData();
+export default function NextButton({ disabled, onClick }) {
+  const { amount, currentIndex } = useData();
 
   function isLastQuestion() {
-    if (amount === counter) {
+    if (currentIndex + 1 === amount) {
       return true;
     } else {
       return false;
@@ -16,9 +16,9 @@ export default function NextButton({ disabled }) {
   return (
     <Button
       disabled={disabled}
-      type="submit"
       variant="contained"
       color={isLastQuestion() ? 'success' : 'primary'}
+      onClick={onClick}
     >
       {isLastQuestion() ? 'Finalizar' : 'Próxima'}
     </Button>

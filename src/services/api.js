@@ -1,7 +1,7 @@
-import axios from 'axios';
+import { create } from 'axios';
 
-export default function api() {
-  axios.create({
-    baseURL: `https://opentdb.com`,
-  });
-}
+const api = create({
+  baseURL: `https://opentdb.com`,
+});
+
+export default api;
