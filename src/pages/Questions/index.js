@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { decode } from 'html-entities';
 import { useHistory } from 'react-router-dom';
+import { decode } from 'html-entities';
 import { Box } from '@mui/system';
 import {
   Radio,
@@ -16,35 +16,39 @@ import {
 import api from '../../services/api';
 import { useData } from '../../contexts/data';
 import { NextButton, LoadingSpinner } from '../../components';
+import { isLastQuestion } from '../../utils/is-last-question';
 
 export default function Questions() {
   const [questionsList, setQuestionsList] = useState([]);
-  const [currentOptions, setCurrentOptions] = useState();
-  const [helperText, setHelperText] = useState('Choose one option.');
+  const [currentOptions, setCurrentOptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState('');
+  const [helperText, setHelperText] = useState('Choose one option.');
 
   const { amount, currentIndex, setCurrentIndex, score, setScore } = useData();
   const history = useHistory();
 
-  const handleRadioChange = (e) => {
+  function handleRadioChange(e) {
     setSelected(e.target.value);
     setHelperText('');
-  };
+  }
 
   function handleNext() {
-    const correctAnswer = questionsList[currentIndex].correct_answer;
+    setCurrentIndex(currentIndex + 1);
 
-    if (selected === correctAnswer) {
+    if (selected === questionsList[currentIndex].correct_answer) {
       setScore(score + 1);
     }
 
-    if (currentIndex + 1 === amount) {
+    if (isLastQuestion(amount, currentIndex)) {
       history.push('/result');
+    } else {
+      setSelected('');
+      setCurrentOptions([
+        ...questionsList[currentIndex + 1].incorrect_answers,
+        questionsList[currentIndex + 1].correct_answer,
+      ]);
     }
-
-    setCurrentIndex(currentIndex + 1);
-    setSelected('');
   }
 
   useEffect(() => {
@@ -54,7 +58,6 @@ export default function Questions() {
       const incorrects = data.data.results[currentIndex].incorrect_answers;
 
       setQuestionsList(data.data.results);
-
       setCurrentOptions([...incorrects, correct]);
       setLoading(false);
     }
@@ -72,12 +75,6 @@ export default function Questions() {
         justifyContent: 'center',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <p>{`currentIndex: ${currentIndex}`}</p>
-        <p>{`amount: ${amount}`}</p>
-        <p>{`score: ${score}`}</p>
-        <p>{`selected: ${selected}`}</p>
-      </div>
       {loading ? (
         <LoadingSpinner />
       ) : (

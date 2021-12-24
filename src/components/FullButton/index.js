@@ -8,7 +8,7 @@ export default function FullButton({ text, color, onClick }) {
   return (
     <Button
       type="submit"
-      disabled={amount === 0}
+      disabled={amount <= 0}
       sx={{ width: '60vw', minWidth: '300px' }}
       color={color}
       variant="contained"
