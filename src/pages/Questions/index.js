@@ -16,7 +16,7 @@ import {
 import api from '../../services/api';
 import { useData } from '../../contexts/data';
 import { NextButton, LoadingSpinner } from '../../components';
-import { isLastQuestion } from '../../utils/is-last-question';
+import { isLastQuestion } from '../../utils';
 
 export default function Questions() {
   const [questionsList, setQuestionsList] = useState([]);
@@ -82,7 +82,7 @@ export default function Questions() {
           <FormControl component="fieldset" variant="standard">
             <FormLabel component="legend" variant="h5">
               <Typography variant="h4">
-                {questionsList[currentIndex].question}
+                {decode(questionsList[currentIndex].question)}
               </Typography>
             </FormLabel>
 
@@ -97,7 +97,7 @@ export default function Questions() {
                   <FormControlLabel
                     value={item}
                     control={<Radio />}
-                    label={item}
+                    label={decode(item)}
                   />
 
                   <Divider />
