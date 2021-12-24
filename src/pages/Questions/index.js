@@ -15,17 +15,25 @@ import {
 } from '@mui/material';
 import api from '../../services/api';
 import { useData } from '../../contexts/data';
-import { NextButton, LoadingSpinner } from '../../components';
 import { isLastQuestion } from '../../utils';
+import { NextButton, LoadingSpinner } from '../../components';
 
 export default function Questions() {
-  const [questionsList, setQuestionsList] = useState([]);
   const [currentOptions, setCurrentOptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState('');
   const [helperText, setHelperText] = useState('Choose one option.');
 
-  const { amount, currentIndex, setCurrentIndex, score, setScore } = useData();
+  const {
+    amount,
+    currentIndex,
+    setCurrentIndex,
+
+    score,
+    setScore,
+    questionsList,
+    setQuestionsList,
+  } = useData();
   const history = useHistory();
 
   function handleRadioChange(e) {
