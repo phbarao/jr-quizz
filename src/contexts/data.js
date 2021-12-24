@@ -7,6 +7,7 @@ export default function DataProvider({ children }) {
   const [questionsList, setQuestionsList] = useState([]);
   const [score, setScore] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [session, setSession] = useState([]);
 
   return (
     <Context.Provider
@@ -17,9 +18,10 @@ export default function DataProvider({ children }) {
         setScore,
         currentIndex,
         setCurrentIndex,
-
         questionsList,
         setQuestionsList,
+        session,
+        setSession,
       }}
     >
       {children}

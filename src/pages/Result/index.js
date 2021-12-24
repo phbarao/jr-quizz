@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
 import { useData } from '../../contexts/data';
 
 export default function Result() {
-  const { amount, score } = useData();
+  const { amount, score, session } = useData();
+
+  useEffect(() => {
+    localStorage.setItem('lastResult', JSON.stringify({ session, score }));
+  }, []);
 
   return (
     <Container

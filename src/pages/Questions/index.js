@@ -28,12 +28,14 @@ export default function Questions() {
     amount,
     currentIndex,
     setCurrentIndex,
-
     score,
     setScore,
     questionsList,
     setQuestionsList,
+    session,
+    setSession,
   } = useData();
+
   const history = useHistory();
 
   function handleRadioChange(e) {
@@ -42,11 +44,11 @@ export default function Questions() {
   }
 
   function handleNext() {
-    setCurrentIndex(currentIndex + 1);
-
     if (selected === questionsList[currentIndex].correct_answer) {
       setScore(score + 1);
     }
+
+    setCurrentIndex(currentIndex + 1);
 
     if (isLastQuestion(amount, currentIndex)) {
       history.push('/result');
@@ -57,6 +59,25 @@ export default function Questions() {
         questionsList[currentIndex + 1].correct_answer,
       ]);
     }
+
+    setSession([
+      ...session,
+      {
+        correct: questionsList[currentIndex].correct_answer,
+        options: currentOptions,
+        question: questionsList[currentIndex].question,
+      },
+    ]);
+
+    // if (isLastQuestion(amount, currentIndex)) {
+    //   history.push('/result');
+    // } else {
+    //   setSelected('');
+    //   setCurrentOptions([
+    //     ...questionsList[currentIndex + 1].incorrect_answers,
+    //     questionsList[currentIndex + 1].correct_answer,
+    //   ]);
+    // }
   }
 
   useEffect(() => {

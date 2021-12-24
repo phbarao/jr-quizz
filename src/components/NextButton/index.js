@@ -8,7 +8,6 @@ export default function NextButton({ disabled, onClick }) {
 
   return (
     <Button
-      type="button"
       disabled={disabled}
       variant="contained"
       color={isLastQuestion(amount, currentIndex) ? 'success' : 'primary'}
